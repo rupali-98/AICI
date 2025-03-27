@@ -9,5 +9,5 @@ Running main.py file will use functions of utils.py and save images of  boundary
 And Visualisation of functions.ipynb will visualize the output of all intermediary functions to show what each function does.
 
 
-###Solution files ###
+### Solution files ###
 Room1_wall.png , Room2_wall.png and Room3_wall.png are my solutions.
