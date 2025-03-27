@@ -45,7 +45,8 @@ def morph_operation_to_get_line(img):
     # Morphological Operations
     kernel = np.ones((3, 3), np.uint8)
     morph = cv2.morphologyEx(img, cv2.MORPH_DILATE, kernel)
-    return morph
+    morph2 = cv2.morphologyEx(morph, cv2.MORPH_OPEN, kernel,iterations=2)
+    return morph2
 
 # def contouring(combined_lines,morph):
 #     # gray_morph = cv2.cvtColor(morph, cv2.COLOR_BGR2GRAY)
