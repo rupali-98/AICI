@@ -47,52 +47,52 @@ def morph_operation_to_get_line(img):
     morph = cv2.morphologyEx(img, cv2.MORPH_DILATE, kernel)
     return morph
 
-def contouring(combined_lines,morph):
-    # gray_morph = cv2.cvtColor(morph, cv2.COLOR_BGR2GRAY)
-    cnts1 = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    cnts = cnts1[0]
-    # Filter contours by area
-    min_area = 1000  # Adjust as needed
-    filtered_contours = [c for c in cnts if cv2.contourArea(c) > min_area]
+# def contouring(combined_lines,morph):
+#     # gray_morph = cv2.cvtColor(morph, cv2.COLOR_BGR2GRAY)
+#     cnts1 = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+#     cnts = cnts1[0]
+#     # Filter contours by area
+#     min_area = 1000  # Adjust as needed
+#     filtered_contours = [c for c in cnts if cv2.contourArea(c) > min_area]
 
-    for c in filtered_contours:
-        left = tuple(c[c[:, :, 0].argmin()][0])
-        right = tuple(c[c[:, :, 0].argmax()][0])
-        top = tuple(c[c[:, :, 1].argmin()][0])
-        bottom = tuple(c[c[:, :, 1].argmax()][0])
+#     for c in filtered_contours:
+#         left = tuple(c[c[:, :, 0].argmin()][0])
+#         right = tuple(c[c[:, :, 0].argmax()][0])
+#         top = tuple(c[c[:, :, 1].argmin()][0])
+#         bottom = tuple(c[c[:, :, 1].argmax()][0])
 
-    for i in range(len(cnts)):
+#     for i in range(len(cnts)):
 
-        min_dist = max(combined_lines.shape[0], combined_lines.shape[1])
+#         min_dist = max(combined_lines.shape[0], combined_lines.shape[1])
 
-        cl = []
+#         cl = []
 
-        ci = cnts[i]
-        ci_left = tuple(ci[ci[:, :, 0].argmin()][0])
-        ci_right = tuple(ci[ci[:, :, 0].argmax()][0])
-        ci_top = tuple(ci[ci[:, :, 1].argmin()][0])
-        ci_bottom = tuple(ci[ci[:, :, 1].argmax()][0])
-        ci_list = [ci_bottom, ci_left, ci_right, ci_top]
+#         ci = cnts[i]
+#         ci_left = tuple(ci[ci[:, :, 0].argmin()][0])
+#         ci_right = tuple(ci[ci[:, :, 0].argmax()][0])
+#         ci_top = tuple(ci[ci[:, :, 1].argmin()][0])
+#         ci_bottom = tuple(ci[ci[:, :, 1].argmax()][0])
+#         ci_list = [ci_bottom, ci_left, ci_right, ci_top]
 
-        for j in range(i + 1, len(cnts)):
-            cj = cnts[j]
-            cj_left = tuple(cj[cj[:, :, 0].argmin()][0])
-            cj_right = tuple(cj[cj[:, :, 0].argmax()][0])
-            cj_top = tuple(cj[cj[:, :, 1].argmin()][0])
-            cj_bottom = tuple(cj[cj[:, :, 1].argmax()][0])
-            cj_list = [cj_bottom, cj_left, cj_right, cj_top]
+#         for j in range(i + 1, len(cnts)):
+#             cj = cnts[j]
+#             cj_left = tuple(cj[cj[:, :, 0].argmin()][0])
+#             cj_right = tuple(cj[cj[:, :, 0].argmax()][0])
+#             cj_top = tuple(cj[cj[:, :, 1].argmin()][0])
+#             cj_bottom = tuple(cj[cj[:, :, 1].argmax()][0])
+#             cj_list = [cj_bottom, cj_left, cj_right, cj_top]
 
-            for pt1 in ci_list:
-              for pt2 in cj_list:
-                dist = int(np.linalg.norm(np.array(pt1) - np.array(pt2)))
-                if dist < min_dist:
-                  min_dist = dist
-                  cl = []
-                  cl.append([pt1, pt2, min_dist])
+#             for pt1 in ci_list:
+#               for pt2 in cj_list:
+#                 dist = int(np.linalg.norm(np.array(pt1) - np.array(pt2)))
+#                 if dist < min_dist:
+#                   min_dist = dist
+#                   cl = []
+#                   cl.append([pt1, pt2, min_dist])
 
-        if len(cl) > 0:
-          cv2.line(morph, cl[0][0], cl[0][1], (255, 255, 255), thickness=10)
-    return morph
+#         if len(cl) > 0:
+#           cv2.line(morph, cl[0][0], cl[0][1], (255, 255, 255), thickness=10)
+#     return morph
 
 def refine_boundary(img):
     contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
