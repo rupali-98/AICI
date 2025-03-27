@@ -4,23 +4,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+
 def noise_reduction(img):
-    blurred = cv2.medianBlur(img, 3) ## Removal of Salt and pepper noise
-    _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY)  # Create binary image.
+    blurred = cv2.medianBlur(img, 3)  ## Removal of Salt and pepper noise
+    # _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY)  # Create binary image.
     # kernel = np.ones((2, 2), np.uint8)  # Define the structuring element
     # closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=2) # Apply Closing
     kernel = np.ones((2, 2), np.uint8)
     eroded = cv2.morphologyEx(blurred, cv2.MORPH_ERODE, kernel, iterations=2)  # Apply erosion
     return eroded
 
+
 def line_detection(img):
-    high_thresh, thresh_im = cv2.threshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    lowThresh = 0.5*high_thresh
+    high_thresh, thresh_im = cv2.threshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 0, 255,
+                                           cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    lowThresh = 0.5 * high_thresh
     ## 1. Canny Edge Detector
     edges = cv2.Canny(img, lowThresh, high_thresh)
     kernel = np.ones((2, 2), np.uint8)
     ## 2. Dilating the edges
-    morph = cv2.morphologyEx(edges, cv2.MORPH_DILATE, kernel) ## Dilate the edges
+    morph = cv2.morphologyEx(edges, cv2.MORPH_DILATE, kernel)  ## Dilate the edges
     # 3. Hough Transform with Adjusted Parameters
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     lines = cv2.HoughLinesP(morph, 1, np.pi / 180, 30, minLineLength=20, maxLineGap=15)  # Adjusted parameters
@@ -41,12 +44,15 @@ def line_detection(img):
             cv2.line(floor_plan, (x1, y1), (x2, y2), 255, 2)
     return floor_plan
 
+
 def morph_operation_to_get_line(img):
     # Morphological Operations
     kernel = np.ones((3, 3), np.uint8)
     morph = cv2.morphologyEx(img, cv2.MORPH_DILATE, kernel)
-    morph2 = cv2.morphologyEx(morph, cv2.MORPH_OPEN, kernel,iterations=2)
-    return morph2
+    # morph2 = cv2.morphologyEx(morph, cv2.MORPH_OPEN, kernel,iterations=2)
+
+    return morph
+
 
 # def contouring(combined_lines,morph):
 #     # gray_morph = cv2.cvtColor(morph, cv2.COLOR_BGR2GRAY)
@@ -95,12 +101,13 @@ def morph_operation_to_get_line(img):
 #           cv2.line(morph, cl[0][0], cl[0][1], (255, 255, 255), thickness=10)
 #     return morph
 
-def refine_boundary(img):
+def refine_boundary(img, area_min):
+    ###area_min: Minimum area for contour detection##
     contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     refined_img = np.zeros_like(img)
     for contour in contours:
         # Check if the contour is closed (area > 0)
-        if cv2.contourArea(contour) > 1000:
+        if cv2.contourArea(contour) > area_min:
             # Approximate the contour with a polygon
             epsilon = 0.0005 * cv2.arcLength(contour, True)  # Adjust epsilon for accuracy
             approx = cv2.approxPolyDP(contour, epsilon, True)
